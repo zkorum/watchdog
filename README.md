@@ -1,6 +1,7 @@
 # Agora Watchdog Server
 
-/!\ This repository is heavy development (pre-alpha) /!\
+[!WARNING]
+This repository is under heavy development (pre-alpha)
 
 The Agora Watchdog Server is an Agora-specific implementation of one of the component of the [Racine Protocol](https://github.com/zkorum/racine).
 
