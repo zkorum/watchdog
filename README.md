@@ -15,14 +15,16 @@ This repo contains:
 
 ## Roadmap
 
-- [ ] Run the server to listen to proofs to the Nostr protocol
+- [x] Run the server to listen to proofs from the Nostr protocol
 - [ ] Verify proofs received
 - [ ] Store proofs in a PGSQL database locally
 - [ ] Refine the proof semantics definition, grouping proofs by actions
-- [ ] Add rate-limited API support to audit Agora's moderation
+- [ ] Group proofs logically in PostgreSQL DB based on above semantics
+- [ ] Add support to use Agora API to audit its moderation
 - [ ] Add support for Waku
 - [ ] Allow for receiving payloads as well
 - [ ] Allow broadcasting payloads via CLI commands
+- [ ] Allow to use the node to request specific data from _any_ storage (starting from Agora centralized DB, Nostr and Waku)
 - [ ] Generalize semantics outside of the Agora-specific context - moving Agora-specific stuff into configuration files or a specific usage of an external library
 - [ ] Move the underlying abstracted code to https://github.com/zkorum/racine and just reuse this by wrapping it with Agora-specific configuration
 
