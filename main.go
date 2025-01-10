@@ -32,7 +32,7 @@ type NostrConfig struct {
 }
 
 // only set default for non-required tag
-func GetDefaultConfig() *Config {
+func GetDefaultConfig(defaultProofChannelEventId string) *Config {
 	return &Config{
 		// Database: DatabaseConfig{
 		// 	SslMode:  "disable",
@@ -40,39 +40,73 @@ func GetDefaultConfig() *Config {
 		// },
 		Nostr: NostrConfig{
 			Url:                 "wss://nos.lol",
-			ProofChannelEventId: "6cde92f2a057368e4871d5dac0f830e09f399bad666a2070e4c4c6c40d235667",
+			ProofChannelEventId: defaultProofChannelEventId,
 		},
 	}
 
 }
 
 func main() {
-	// Get config struct and default variables
-	conf := GetDefaultConfig()
-
-	// this will mutate the `conf` variable:
-	_, err := snakelet.InitAndLoad(conf, "./watchdog.yml")
-	if err != nil {
-		fmt.Println("Unable to init and load config: %w", err)
-		os.Exit(1)
-	}
-
-	ctx := context.Background()
-	relay, err := nostr.RelayConnect(ctx, conf.Nostr.Url)
-	if err != nil {
-		fmt.Println("Unable to connect to Nostr relay: %w", err)
-		os.Exit(1)
-	}
-
+	var relay *nostr.Relay = nil
+	var conf *Config = nil
+	defaultProofChannelEventId := "6cde92f2a057368e4871d5dac0f830e09f399bad666a2070e4c4c6c40d235667"
 	cmd := &cli.Command{
+		Name:      "Agora Watchdog CLI",
+		Version:   "v0.1.0",
+		Copyright: "(c) 2025 ZKorum SAS",
+		Usage:     "verify Agora moderation history",
+		UsageText: "agora-watchdog -c ./watchdog.yml listen",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:     "config",
+				Aliases:  []string{"c"},
+				Usage:    "Location of the config file - default to ./watchdog.yml",
+				Required: false,
+				Value:    "", // will only load default values
+				Sources: cli.ValueSourceChain{
+					Chain: []cli.ValueSource{
+						cli.EnvVar("WATCHDOG_CONFIG"),
+						cli.File("./watchdog.yml"),
+					},
+				},
+			},
+		},
+		Before: func(ctx context.Context, cmd *cli.Command) (context.Context, error) {
+			// Get config struct and default variables
+
+			conf = GetDefaultConfig(defaultProofChannelEventId)
+
+			// this will mutate the `conf` variable:
+			_, err := snakelet.InitAndLoad(conf, "./watchdog.yml")
+			if err != nil {
+				fmt.Println("Unable to init and load config: %w", err)
+				return nil, err
+			}
+			relay, err = nostr.RelayConnect(ctx, conf.Nostr.Url)
+			if err != nil {
+				fmt.Println("Unable to connect to Nostr relay: %w", err)
+				return nil, err
+			}
+			return nil, nil
+		},
 		Commands: []*cli.Command{
+
 			{
 				Name:    "listen",
 				Aliases: []string{"l"},
-				Usage:   "listen to proof and store them in local PostgreSQL database",
+				Usage:   "listen to proofs, verify and store them in a local PostgreSQL database",
+				Flags: []cli.Flag{
+					&cli.StringFlag{
+						Name:     "proof-channel-event-id",
+						Usage:    "NIP 40 Event ID for the Proof Channel, used by Agora to broadcast data in the Nostr relay.",
+						Required: false,
+						Value:    defaultProofChannelEventId,
+					},
+				},
 				Action: func(ctx context.Context, cmd *cli.Command) error {
+					proofChannelEventId := cmd.String("proof-channel-event-id")
 					tagMap := map[string][]string{
-						"e": {conf.Nostr.ProofChannelEventId},
+						"e": {proofChannelEventId},
 					}
 					// t := make(map[string][]string)
 					// // making a "p" tag for the above public key.
