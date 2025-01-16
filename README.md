@@ -28,6 +28,30 @@ This repo contains:
 - [ ] Generalize semantics outside of the Agora-specific context - moving Agora-specific stuff into configuration files or a specific usage of an external library
 - [ ] Move the underlying abstracted code to https://github.com/zkorum/racine and just reuse this by wrapping it with Agora-specific configuration
 
+## Usage
+
+→ go run main.go --help
+NAME:
+   Agora Watchdog CLI - verify Agora moderation history
+
+USAGE:
+   agora-watchdog -c ./watchdog.yml listen
+
+VERSION:
+   v0.1.0
+
+COMMANDS:
+   listen, l  listen to proofs, verify and store them in a local PostgreSQL database
+   help, h    Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --config value, -c value  Location of the config file - default to ./watchdog.yml [$WATCHDOG_CONFIG]
+   --help, -h                show help
+   --version, -v             print the version
+
+COPYRIGHT:
+   (c) 2025 ZKorum SAS
+
 ## License
 
 © 2024 ZKorum SAS <hello@zkorum.com>.
