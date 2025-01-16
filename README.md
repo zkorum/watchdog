@@ -52,6 +52,11 @@ GLOBAL OPTIONS:
 COPYRIGHT:
    (c) 2025 ZKorum SAS
 
+## Acknowledgements
+
+This project has received funding from the European Union's Horizon Europe 2020 research and innovation program through the [NGI TRUSTCHAIN](https://trustchain.ngi.eu/) program under cascade funding agreement No. 101093274.
+The grant funded the project's ongoing ideation process, along with the development of the initial CLI structure and the implementation of the listen command.
+
 ## License
 
 © 2024 ZKorum SAS <hello@zkorum.com>.
