@@ -87,6 +87,7 @@ func main() {
 				fmt.Println("Unable to connect to Nostr relay: %w", err)
 				return nil, err
 			}
+			fmt.Printf("Connected to %s\n", conf.Nostr.Url)
 			return nil, nil
 		},
 		Commands: []*cli.Command{
@@ -100,13 +101,18 @@ func main() {
 						Name:     "proof-channel-event-id",
 						Usage:    "NIP 40 Event ID for the Proof Channel, used by Agora to broadcast data in the Nostr relay.",
 						Required: false,
-						Value:    defaultProofChannelEventId,
 					},
 				},
 				Action: func(ctx context.Context, cmd *cli.Command) error {
 					proofChannelEventId := cmd.String("proof-channel-event-id")
+					var actualProofChannelEventId string
+					if proofChannelEventId != "" {
+						actualProofChannelEventId = proofChannelEventId
+					} else {
+						actualProofChannelEventId = conf.Nostr.ProofChannelEventId
+					}
 					tagMap := map[string][]string{
-						"e": {proofChannelEventId},
+						"e": {actualProofChannelEventId},
 					}
 					// t := make(map[string][]string)
 					// // making a "p" tag for the above public key.
@@ -127,7 +133,7 @@ func main() {
 					}
 					defer sub.Unsub()
 
-					fmt.Println("Listening for proof events...")
+					fmt.Printf("Listening for proof events in channel id '%s'...\n", actualProofChannelEventId)
 					for ev := range sub.Events {
 						// handle returned event.
 						// channel will stay open until the ctx is cancelled (in this case, context timeout)
